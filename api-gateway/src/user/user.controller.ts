@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -6,19 +7,18 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
-import { ClientProxySuperFlights } from 'src/common/proxy/client.proxy';
-import { UserDTO } from './dto/user.dto';
+import { UserMSG } from './../common/constants';
 import { Observable } from 'rxjs';
+import { UserDTO } from './dto/user.dto';
+import { ClientProxySuperFlights } from 'src/common/proxy/client.proxy';
 import { IUser } from 'src/common/interfaces/user.interface';
-import { UserMSG } from 'src/common/constants';
-import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('User')
+@ApiTags('users')
 @Controller('api/v2/user')
 export class UserController {
   constructor(private readonly clientProxy: ClientProxySuperFlights) {}
-
   private _clientProxyUser = this.clientProxy.clientProxyUsers();
 
   @Post()
@@ -37,10 +37,7 @@ export class UserController {
   }
 
   @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body('user') userDTO: UserDTO,
-  ): Observable<IUser> {
+  update(@Param('id') id: string, @Body() userDTO: UserDTO): Observable<IUser> {
     return this._clientProxyUser.send(UserMSG.UPDATE, { id, userDTO });
   }
 
